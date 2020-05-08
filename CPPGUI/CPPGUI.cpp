@@ -16,9 +16,9 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 void owo();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
 #ifdef _DEBUG
     AllocConsole();
@@ -32,9 +32,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     app = new Application(hInstance, L"MyProgramThingy");
     mainWindow = new someWindow(app, L"oWo lOl");
     mainWindow->Show();
-    //Event* evn = new Event(owo);
+    Event* evn = new Event(owo);
 
-    Button* button = new Button(mainWindow->Handle);
+    Button button(mainWindow->Handle, evn);
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0)) {
@@ -42,14 +42,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         DispatchMessage(&msg);
     }
 
-    delete button;
     delete mainWindow;
     delete app;
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 void owo()
 {
-    Button button(mainWindow->Handle, L"owo", 100, 32, 50, 50);
+    MessageBoxW(mainWindow->Handle, L"button clicked", L"owow", MB_OK);
 }

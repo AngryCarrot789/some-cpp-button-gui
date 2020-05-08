@@ -9,8 +9,8 @@ typedef void (*Callback)();
 class Event
 {
 public:
-    void* Parameters;
-    Event(pCallback callbackFunction, void* params)
+    void* Parameters = nullptr;
+    Event(pCallback callbackFunction, void* params = nullptr)
     {
         Parameters = params;
         pcallback = callbackFunction;
@@ -23,7 +23,7 @@ public:
 
     void Call()
     {
-        if (callback != nullptr)(*callback)();
+        if (callback != nullptr && callback != (Callback)4294967294)(*callback)();
         if (pcallback != nullptr && Parameters == nullptr)
             (*pcallback)(Parameters);
     }

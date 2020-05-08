@@ -63,15 +63,38 @@ LRESULT CALLBACK Window::CustomWndProc(HWND hWnd, UINT message, WPARAM wParam, L
     HDC          hdc;
     PAINTSTRUCT  ps;
     switch (message) {
-    case WM_PAINT:
-        hdc = BeginPaint(hWnd, &ps);
-        OnPaint(hdc);
-        EndPaint(hWnd, &ps);
-        return 0;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+        case WM_PAINT:
+        {
+            // All painting occurs here, between BeginPaint and EndPaint.
+
+            hdc = BeginPaint(hWnd, &ps);
+            OnPaint(hdc, ps);
+            EndPaint(hWnd, &ps);
+            return 0;
+        }
+        case WM_SIZE:
+        {
+            int width = LOWORD(lParam);  // Macro to get the low-order word.
+            int height = HIWORD(lParam); // Macro to get the high-order word.
+
+            // Respond to the message:
+            OnSize(hWnd, (UINT)wParam, width, height);
+        }
+        break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
     }
+    return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void Window::OnPaint(HDC hdc, PAINTSTRUCT ps)
+{
+    FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+}
+
+// handles resizing
+void Window::OnSize(HWND hwnd, UINT flag, int width, int height)
+{
+
 }

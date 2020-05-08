@@ -18,7 +18,8 @@ public:
 	//Show the window
 	void Show();
 	//Called when the window is painted
-	void OnPaint(HDC hdc) {}
+	void OnPaint(HDC, PAINTSTRUCT);
+	virtual void OnSize(HWND hwnd, UINT flag, int width, int height);
 	virtual LRESULT CALLBACK CustomWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 private:
 	Application* RelativeApp{};

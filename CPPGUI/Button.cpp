@@ -1,6 +1,10 @@
 #include "Button.h"
 #include "Resource.h"
-Button::Button(HWND window, LPCWSTR buttonText, int nWidth, int nHeight, int x, int y)
+Button::Button(HWND window, 
+    LPCWSTR buttonText,
+    int nWidth, int nHeight, 
+    int x, int y,
+    int controlID)
 {
     Text = buttonText;
     Width = nWidth;
@@ -8,6 +12,7 @@ Button::Button(HWND window, LPCWSTR buttonText, int nWidth, int nHeight, int x, 
     X = x;
     Y = y;
     ParentWindow = window;
+
     Handle = CreateWindow(
         L"BUTTON",    // Predefined class; Unicode assumed 
         buttonText,   // Button text 
@@ -16,13 +21,20 @@ Button::Button(HWND window, LPCWSTR buttonText, int nWidth, int nHeight, int x, 
         Y,               // y position 
         Width,           // Button width
         Height,          // Button height
-        window,          // Parent window
-        (HMENU)69420,
-        (HINSTANCE)GetWindowLongPtr(window, GWLP_HINSTANCE),
-        (void*)69420);
+        ParentWindow,    // Parent window
+        (HMENU)controlID,
+        (HINSTANCE)GetWindowLongPtr(ParentWindow, GWLP_HINSTANCE),
+        NULL);
+    LONG_PTR owo = (LONG_PTR)this;
+    SetWindowLongPtrW(Handle, GWLP_USERDATA, owo);
 }
 
-Button::Button(HWND window, Event* clickCallback, LPCWSTR buttonText, int nWidth, int nHeight, int x, int y)
+Button::Button(HWND window, 
+    Event* clickCallback,
+    LPCWSTR buttonText, 
+    int nWidth, int nHeight, 
+    int x, int y, 
+    int controlID)
 {
     Text = buttonText;
     Width = nWidth;
@@ -30,7 +42,6 @@ Button::Button(HWND window, Event* clickCallback, LPCWSTR buttonText, int nWidth
     X = x;
     Y = y;
     ParentWindow = window;
-
     Handle = CreateWindowW(
         L"BUTTON",    // Predefined class; Unicode assumed 
         buttonText,   // Button text 
@@ -40,14 +51,21 @@ Button::Button(HWND window, Event* clickCallback, LPCWSTR buttonText, int nWidth
         Width,           // Button width
         Height,          // Button height
         ParentWindow,    // Parent window
-        (HMENU)69420,
+        (HMENU)controlID,
         (HINSTANCE)GetWindowLongPtr(ParentWindow, GWLP_HINSTANCE),
-        (void*)69420);
-    delete OnClick;
+        NULL);
+    LONG_PTR owo = (LONG_PTR)this;
+    SetWindowLongPtrW(Handle, GWLP_USERDATA, owo);
+    //delete OnClick;
     OnClick = clickCallback;
 }
 
-LRESULT Button::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+void Button::HandleMessage(WPARAM wParam, LPARAM lParam)
 {
-    return DefWindowProc(Handle, uMsg, wParam, lParam);
+    if (LOWORD(wParam) == ControlID) {
+        if (OnClick != nullptr) {
+            //OnClick->Parameters = (void*)this;
+            OnClick->Call();
+        }
+    }
 }

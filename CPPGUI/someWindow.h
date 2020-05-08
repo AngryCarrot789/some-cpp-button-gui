@@ -1018,12 +1018,20 @@ public:
 	{
 
 	}
-    ~someWindow()
+
+    BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam)
     {
-        delete this;
+        ((Button*)(GetWindowLongPtrW(hwnd, GWLP_USERDATA)))->HandleMessage(lParam, lParam);
+        return false;
     }
 
-#define thingy(x) LOWORD(x) 
+    BOOL CALLBACK Do(HWND hWnd, WPARAM wParam, LPARAM lParam)
+    {
+        return EnumChildWindows(
+            Handle,
+            (WNDENUMPROC)EnumChildProc((HWND)lParam, wParam),
+            wParam);
+    }
 
     int eventCounter;
     LRESULT CALLBACK CustomWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override
@@ -1040,13 +1048,14 @@ public:
             " -> WPARAMLO " << LOWORD(wParam) << " -> WPARAMHI " << HIWORD(wParam) <<
             " -> LPARAMLO " << LOWORD(lParam) << " -> LPARAMHI " << HIWORD(lParam) << '\n';
         eventCounter++;
-        auto owo = GetWindowLongPtrW(Handle, GWLP_USERDATA);
-        std::cout << "HWND: " << GetWindow(hWnd, owo) << '\n';
+
         switch (message) {
-            case WM_COMMAND: break;
+            case WM_COMMAND: 
+                Do(hWnd, wParam, lParam);
+                return 0;
             case WM_PAINT:
                 hdc = BeginPaint(hWnd, &ps);
-                OnPaint(hdc);
+                OnPaint(hdc, ps);
                 EndPaint(hWnd, &ps);
                 return 0;
             case WM_DESTROY:
